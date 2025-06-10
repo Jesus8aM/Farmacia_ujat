@@ -91,13 +91,18 @@ def main(page: ft.Page):
     page.window_width = 800
     page.window_height = 600
 
-    page.appbar = ft.AppBar(
-        title=ft.Text("Interacciones UJAT", weight=ft.FontWeight.BOLD),
-        leading=ft.Icon(ft.Icons.MEDICAL_SERVICES, color=ft.Colors.WHITE),
-        bgcolor=ft.Colors.DEEP_PURPLE_300,
-        color="white",
-        center_title=True
-    )
+   page.appbar = ft.AppBar(
+    title=ft.Text("Interacciones UJAT", weight=ft.FontWeight.BOLD),
+    leading=ft.Icon(ft.Icons.MEDICAL_SERVICES, color=ft.Colors.WHITE),
+    actions=[
+        ft.Image(src="logo.png", width=80, height=80, color="white"),
+        ft.IconButton(icon=ft.icons.EXIT_TO_APP, tooltip="Regresar", on_click=regresar_al_menu)
+    ],
+    bgcolor=ft.Colors.DEEP_PURPLE_300,
+    color="white",
+    center_title=True
+)
+
 
     lista = []
     medicamentos = db.collection("medicamento").stream()
