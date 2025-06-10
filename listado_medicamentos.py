@@ -12,8 +12,8 @@ def main(page: ft.Page):
 
     def regresar_al_menu(e):
         page.clean()
-        import app  # Cambia a 'main' si tu archivo principal se llama diferente
-        app.main(page)
+        import main  
+        main.main(page)
 
     page.title = "Listado de medicamentos UJAT"
     page.window_width = 900
