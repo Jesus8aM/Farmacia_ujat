@@ -5,6 +5,13 @@ import listado_medicamentos as lista
 
 import os
 
+from firebase_admin import credentials, initialize_app
+
+cred_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+if cred_path and not len(initialize_app._apps):  
+    cred = credentials.Certificate(cred_path)
+    initialize_app(cred)
+
 def main(page: ft.Page):
 
     def mostrar_interacciones(e: ft.ControlEvent):
@@ -101,3 +108,4 @@ def main(page: ft.Page):
 
 
 ft.app(target=main, view=ft.AppView.WEB_BROWSER, route_url_strategy="hash", port=int(os.environ.get("PORT", 8000)))
+
