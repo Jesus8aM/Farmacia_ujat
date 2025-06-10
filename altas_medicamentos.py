@@ -18,8 +18,8 @@ def main(page: ft.Page):
 
     def regresar_al_menu(e):
         page.clean()
-        import app  # Cambia a 'main' si tu archivo principal se llama main.py
-        app.main(page)
+        import main  # Cambia a 'main' si tu archivo principal se llama main.py
+        main.main(page)
 
     def guardar_medicamento(e: ft.ControlEvent):
         clave = txt_clave.value.strip()
