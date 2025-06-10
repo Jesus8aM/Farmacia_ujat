@@ -5,12 +5,16 @@ import listado_medicamentos as lista
 
 import os
 
-from firebase_admin import credentials, initialize_app
+
+from firebase_admin import credentials, initialize_app, get_apps
 
 cred_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
-if cred_path and not len(initialize_app._apps):  
-    cred = credentials.Certificate(cred_path)
-    initialize_app(cred)
+if cred_path and not get_apps():  
+    try:
+        cred = credentials.Certificate(cred_path)
+        initialize_app(cred)
+    except Exception as e:
+        print(f"Error al inicializar Firebase: {e}")
 
 def main(page: ft.Page):
 
@@ -108,4 +112,5 @@ def main(page: ft.Page):
 
 
 ft.app(target=main, view=ft.AppView.WEB_BROWSER, route_url_strategy="hash", port=int(os.environ.get("PORT", 8000)))
+
 
