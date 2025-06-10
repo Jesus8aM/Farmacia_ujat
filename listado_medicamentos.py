@@ -9,16 +9,28 @@ if not firebase_admin._apps:
 db = firestore.client()
 
 def main(page: ft.Page):
+
+    def regresar_al_menu(e):
+        page.clean()
+        import app  # Cambia a 'main' si tu archivo principal se llama diferente
+        app.main(page)
+
     page.title = "Listado de medicamentos UJAT"
     page.window_width = 900
     page.window_height = 600
     page.scroll = True
     page.theme_mode = "light"
+
     page.appbar = ft.AppBar(
         title=ft.Text("Listado de medicamentos UJAT"),
-        leading=ft.Icon("receipt_long"),
+        leading=ft.Icon(ft.icons.RECEIPT_LONG),
+        actions=[
+            ft.Image(src="logo.png", width=80, height=80, color="white"),
+            ft.IconButton(icon=ft.icons.EXIT_TO_APP, tooltip="Regresar", on_click=regresar_al_menu)
+        ],
         bgcolor="blue",
-        center_title=True,
+        color="white",
+        center_title=True
     )
 
     encabezado = [
@@ -30,18 +42,16 @@ def main(page: ft.Page):
     ]
 
     filas = []
-
-    # 🔁 Leer medicamentos desde Firestore
     medicamentos = db.collection("medicamento").stream()
     for doc in medicamentos:
         data = doc.to_dict()
-        celda1 = ft.DataCell(ft.Text(data.get("descripcion", ""), weight="bold"))
-        celda2 = ft.DataCell(ft.Text(data.get("presentacion", "")))
-        celda3 = ft.DataCell(ft.Text(data.get("clasificacion", ""), italic=True))
-        celda4 = ft.DataCell(ft.Text(data.get("nivel_atencion", "")))
-        celda5 = ft.DataCell(ft.Text(data.get("nombre_farmaco", ""), color="pink"))  # nombre del farmaco
-
-        fila = ft.DataRow([celda1, celda2, celda3, celda4, celda5])
+        fila = ft.DataRow([
+            ft.DataCell(ft.Text(data.get("descripcion", ""), weight="bold")),
+            ft.DataCell(ft.Text(data.get("presentacion", ""))),
+            ft.DataCell(ft.Text(data.get("clasificacion", ""), italic=True)),
+            ft.DataCell(ft.Text(data.get("nivel_atencion", ""))),
+            ft.DataCell(ft.Text(data.get("nombre_farmaco", ""), color="pink"))
+        ])
         filas.append(fila)
 
     tabla = ft.DataTable(columns=encabezado, rows=filas)
