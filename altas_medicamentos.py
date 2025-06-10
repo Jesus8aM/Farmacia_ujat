@@ -1,14 +1,25 @@
 import flet as ft
+import os
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-# Conexión a Firebase
-if not firebase_admin._apps:
-    cred = credentials.Certificate("farmacia-ujat-firebase-adminsdk-fbsvc-5a1534d9ec.json")
-    firebase_admin.initialize_app(cred)
+# 🔐 Inicializar Firebase con ruta desde variable de entorno
+cred_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+if cred_path and not firebase_admin._apps:
+    try:
+        cred = credentials.Certificate(cred_path)
+        firebase_admin.initialize_app(cred)
+    except Exception as e:
+        print(f"Error al inicializar Firebase: {e}")
+
 db = firestore.client()
 
 def main(page: ft.Page):
+
+    def regresar_al_menu(e):
+        page.clean()
+        import app  # Cambia a 'main' si tu archivo principal se llama main.py
+        app.main(page)
 
     def guardar_medicamento(e: ft.ControlEvent):
         clave = txt_clave.value.strip()
@@ -51,12 +62,17 @@ def main(page: ft.Page):
     page.window_width = 200
     page.window_height = 350
     page.window_resizable = False
+
     page.appbar = ft.AppBar(
         leading=ft.Icon("medical_services"),
         title=ft.Text("Nuevo medicamento"),
         center_title=True,
         bgcolor="green",
-        color="white"
+        color="white",
+        actions=[
+            ft.Image(src="logo.png", width=80, height=80, color="white"),
+            ft.IconButton(icon=ft.icons.EXIT_TO_APP, tooltip="Regresar", on_click=regresar_al_menu)
+        ]
     )
 
     txt_clave = ft.TextField(label="Clave", width=200, border="underline", filled=True, value="S/C")
@@ -117,7 +133,15 @@ def main(page: ft.Page):
 
     fila_boton = ft.Row([btn_guardar, btn_cancelar])
 
-    page.add(txt_clave, txt_descripcion, txt_presentacion, drp_clasificacion, drp_nivel, drp_farmaco, fila_boton)
+    page.add(
+        txt_clave,
+        txt_descripcion,
+        txt_presentacion,
+        drp_clasificacion,
+        drp_nivel,
+        drp_farmaco,
+        fila_boton
+    )
     page.update()
 
 if __name__ == "__main__":
