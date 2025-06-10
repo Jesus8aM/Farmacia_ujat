@@ -1,11 +1,17 @@
 import flet as ft
+import os
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-# Conexión a Firebase
-if not firebase_admin._apps:
-    cred = credentials.Certificate("farmacia-ujat-firebase-adminsdk-fbsvc-5a1534d9ec.json")
-    firebase_admin.initialize_app(cred)
+# 🔐 Inicializar Firebase con ruta desde variable de entorno
+cred_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+if cred_path and not firebase_admin._apps:
+    try:
+        cred = credentials.Certificate(cred_path)
+        firebase_admin.initialize_app(cred)
+    except Exception as e:
+        print(f"Error al inicializar Firebase en interacciones: {e}")
+
 db = firestore.client()
 
 def main(page: ft.Page):
@@ -27,7 +33,6 @@ def main(page: ft.Page):
             desc = drp_medicamentos5.value
             txt = txt_interaccion5
 
-        # Buscar coincidencia entre farmaco.nombre y medicamento.descripcion
         farmacos = db.collection("farmaco").stream()
         encontrado = False
         for doc in farmacos:
@@ -44,15 +49,15 @@ def main(page: ft.Page):
 
     def guardar_receta(e: ft.ControlEvent):
         if drp_medicamentos1.value is None:
-            snack_bar = ft.SnackBar(
-                content=ft.Text("Selecciona el primer medicamento"),
-                bgcolor="red",
-                show_close_icon=True
+            page.open(
+                ft.SnackBar(
+                    content=ft.Text("Selecciona el primer medicamento"),
+                    bgcolor="red",
+                    show_close_icon=True
+                )
             )
-            page.open(snack_bar)
             return
 
-        # Guardar en receta
         for drp, txt in [
             (drp_medicamentos1, txt_interaccion1),
             (drp_medicamentos2, txt_interaccion2),
@@ -66,23 +71,21 @@ def main(page: ft.Page):
                     "interaccion": txt.value
                 })
 
-        snack_bar = ft.SnackBar(
-            content=ft.Text("Éxito"),
-            bgcolor="blue",
-            show_close_icon=True
+        page.open(
+            ft.SnackBar(
+                content=ft.Text("Éxito"),
+                bgcolor="blue",
+                show_close_icon=True
+            )
         )
-        page.open(snack_bar)
 
-        # Limpiar campos
         for drp in [drp_medicamentos1, drp_medicamentos2, drp_medicamentos3, drp_medicamentos4, drp_medicamentos5]:
             drp.value = None
-            drp.label = drp.label
             drp.update()
         for txt in [txt_interaccion1, txt_interaccion2, txt_interaccion3, txt_interaccion4, txt_interaccion5]:
             txt.value = ""
             txt.update()
 
-    # Configurar página
     page.title = "Interacciones medicamentosas"
     page.theme_mode = "light"
     page.window_width = 800
@@ -96,7 +99,6 @@ def main(page: ft.Page):
         center_title=True
     )
 
-    # Cargar lista de medicamentos
     lista = []
     medicamentos = db.collection("medicamento").stream()
     for doc in medicamentos:
@@ -133,7 +135,7 @@ def main(page: ft.Page):
         expand=True, spacing=20
     )
 
-    row_componetes = ft.Row([col_medicamentos, col_interacciones], spacing=60)
+    row_componentes = ft.Row([col_medicamentos, col_interacciones], spacing=60)
 
     btn_aceptar = ft.ElevatedButton(
         text="Guardar",
@@ -155,7 +157,7 @@ def main(page: ft.Page):
     )
 
     row_botones = ft.Row([btn_aceptar, btn_cancelar], alignment="end", spacing=20)
-    page.add(row_componetes, row_botones)
+    page.add(row_componentes, row_botones)
     page.update()
 
 if __name__ == "__main__":
