@@ -91,7 +91,7 @@ def main(page: ft.Page):
     page.window_width = 800
     page.window_height = 600
 
-   page.appbar = ft.AppBar(
+    page.appbar = ft.AppBar(
     title=ft.Text("Interacciones UJAT", weight=ft.FontWeight.BOLD),
     leading=ft.Icon(ft.Icons.MEDICAL_SERVICES, color=ft.Colors.WHITE),
     actions=[
@@ -101,7 +101,7 @@ def main(page: ft.Page):
     bgcolor=ft.Colors.DEEP_PURPLE_300,
     color="white",
     center_title=True
-)
+    )
 
 
     lista = []
